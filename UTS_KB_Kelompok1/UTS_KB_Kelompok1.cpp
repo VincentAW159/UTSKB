@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <string>
 #include <iostream>
 #include <math.h>
 #include <stdlib.h>
@@ -9,7 +10,7 @@ using namespace std;
 
 struct node
 {
-	int block[9];
+	int block[25];
 	char* str;
 	int pathcost;
 	int valid;
@@ -17,74 +18,137 @@ struct node
 	node* next;
 };
 
-int heur(int block[]);
-void prepend(node* newnode, node* oldnode, int operator1);
-int goal(int* block);
-int notonqueue(int block[]);
+void prepend(node* newnode, node* oldnode, int operator1, int size);
+int goal(int* block, int sizee);
+int notonqueue(int block[], int size);
 node* bestnode();
-void print(int* block);
+void print(int* block, int size, int size2);
 int apply(int* newstate, int* oldstate, int op);
 node* newelement();
 int op(char);
-char to_char(int i);
+int to_char(int i, int size);
+int heur1(int block[], int size);
 int totalpathcost;
 
 char rep[] = "dulr";
-int notvalid1[4] = { 6, 0, 0, 2 };
-int notvalid2[4] = { 7, 1, 3, 5 };
-int notvalid3[4] = { 8, 2, 6, 8 };
-int applyparam[4] = { +3, -3, -1, +1 };
-int goal_block[9] = { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
+int notvalid31[4] = { 6, 0, 0, 2 };
+int notvalid32[4] = { 7, 1, 3, 5 };
+int notvalid33[4] = { 8, 2, 6, 8 };
+int applyparam3[4] = { +3, -3, -1, +1 };
+int notvalid41[4] = { 12, 0, 0, 3 };
+int notvalid42[4] = { 13, 1, 4, 7};
+int notvalid43[4] = { 14, 2, 8, 11 };
+int notvalid44[4] = { 15, 3, 12, 15 };
+int applyparam4[4] = { +4, -4, -1, +1 };
+int notvalid51[4] = { 20, 0, 0, 4};
+int notvalid52[4] = { 21, 1, 5, 9};
+int notvalid53[4] = { 22, 2, 10, 14};
+int notvalid54[4] = { 23, 3, 15, 19};
+int notvalid55[4] = { 24, 4, 20, 24};
+int applyparam5[4] = { +5, -5, -1, +1 };
+int goal_block3[9] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+int goal_block4[16] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
+int goal_block5[25] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25};
 int maxdepth;
 node* top;
 
-int heur(int* block)
-{
-	int nol = 0;
-
-	for (int i = 0; i < 9; i++)
+int heur1(int* block, int size) {
+	int counter = 0;
+	
+	switch (size)
 	{
-		nol += abs((i / 3) - (block[i] / 3));
-		nol += abs((i % 3) - (block[i] % 3));
+	case 3:
+		for (int i = 0; i < size; i++)
+		{
+			if (block[i] == goal_block3[i])
+			{
+				counter++;
+			}
+		}
+		return counter;
+		break;
+	case 4:
+		for (int i = 0; i < size; i++)
+		{
+			if (block[i] == goal_block4[i])
+			{
+				counter++;
+			}
+		}
+		return counter;
+		break;
+	case 5:
+		for (int i = 0; i < size; i++)
+		{
+			if (block[i] == goal_block5[i])
+			{
+				counter++;
+			}
+		}
+		return counter;
+		break;
 	}
-	return nol;
 }
 
-void prepend(node* newnode, node* oldnode, int op)
+void prepend(node* newnode, node* oldnode, int op, int size)
 {
 	newnode->next = top;
 	top = newnode;
 
-	strcpy(newnode->str,oldnode->str);
+	strcpy(newnode->str, oldnode->str);
 	newnode->str[oldnode->pathcost] = rep[op];
 	newnode->str[oldnode->pathcost + 1] = 0;
 
 	newnode->pathcost = oldnode->pathcost + 1;
-	newnode->totalcost = newnode->pathcost + heur(newnode->block);
+	newnode->totalcost = newnode->pathcost + heur1(newnode->block, size);
 	if (newnode->totalcost < oldnode->totalcost) newnode->totalcost = oldnode->totalcost;
 }
 
-int goal(int* block)
+int goal(int* block, int size)
 {
-	int* g_block = goal_block;
+	int siz = size;
+	if (size == 9)
+	{
+		int* g_block = goal_block3;
 
-	for (int i = 0; i < 9; i++)
-		if ((*(block++)) != (*(g_block++)))
-			return 0;
+		for (int i = 0; i < siz; i++)
+			if ((*(block++)) != (*(g_block++)))
+				return 0;
 
-	return 1;
+		return 1;
+	}
+	else if (size == 16)
+	{
+		int* g_block = goal_block4;
+
+		for (int i = 0; i < siz; i++)
+			if ((*(block++)) != (*(g_block++)))
+				return 0;
+
+		return 1;
+	}
+	else if (size == 25)
+	{
+		int* g_block = goal_block5;
+
+		for (int i = 0; i < siz; i++)
+			if ((*(block++)) != (*(g_block++)))
+				return 0;
+
+		return 1;
+	}
 }
 
-int notonqueue(int* block)
+int notonqueue(int* block, int size)
 {
 	int i;
 	node* t = top;
 
 	while (t != NULL)
 	{
-		for (i = 0; i < 9; i++)
+		for (i = 0; i < size; i++)
 			if (t->block[i] != block[i]) break;
-		if (i == 9) return 0;
+		if (i == size) return 0;
 
 		t = t->next;
 	}
@@ -113,24 +177,61 @@ node* bestnode()
 	return nol;
 }
 
-int apply(int* newstate, int* oldstate, int op)
+int apply(int* newstate, int* oldstate, int op, int size)
 {
 	int j;
-	int blank;
+	int blank = 0;
+	int siz = size * size;
 
-	for (j = 0; j < 9; j++)
-		if (oldstate[j] == 8) { blank = j; break; }
+	switch (size)
+	{
+	case 3:
 
-	if (blank == notvalid1[op] || blank == notvalid2[op] || blank == notvalid3[op])
-		return -1;
+		for (j = 0; j < siz; j++)
+			if (oldstate[j] == siz) { blank = j; break; }
 
-	for (j = 0; j < 9; j++)
-		newstate[j] = oldstate[j];
+		if (blank == notvalid31[op] || blank == notvalid32[op] || blank == notvalid33[op])
+			return -1;
 
-	newstate[blank] = newstate[blank + applyparam[op]];
-	newstate[blank + applyparam[op]] = 8;
+		for (j = 0; j < siz; j++)
+			newstate[j] = oldstate[j];
 
-	return 1;
+		newstate[blank] = newstate[blank + applyparam3[op]];
+		newstate[blank + applyparam3[op]] = siz;
+
+		return 1;
+		break;
+	case 4:
+		for (j = 0; j < siz; j++)
+			if (oldstate[j] == siz) { blank = j; break; }
+
+		if (blank == notvalid41[op] || blank == notvalid42[op] || blank == notvalid43[op] || blank == notvalid44[op])
+			return -1;
+
+		for (j = 0; j < siz; j++)
+			newstate[j] = oldstate[j];
+
+		newstate[blank] = newstate[blank + applyparam4[op]];
+		newstate[blank + applyparam4[op]] = siz;
+
+		return 1;
+		break;
+	case 5:
+		for (j = 0; j < siz; j++)
+			if (oldstate[j] == siz) { blank = j; break; }
+
+		if (blank == notvalid51[op] || blank == notvalid52[op] || blank == notvalid53[op] || blank == notvalid54[op] || blank == notvalid55[op])
+			return -1;
+
+		for (j = 0; j < siz; j++)
+			newstate[j] = oldstate[j];
+
+		newstate[blank] = newstate[blank + applyparam5[op]];
+		newstate[blank + applyparam5[op]] = siz;
+
+		return 1;
+		break;
+	}
 }
 
 node* newelement()
@@ -146,25 +247,47 @@ node* newelement()
 	return t;
 }
 
-void print(int* block)
+void print(int* block, int siz, int sizori)
 {
-	cout << endl;
-	cout << "-------";
-	cout << endl << "|" << to_char(block[0]) << "|" << to_char(block[1]) << "|" << to_char(block[2]) << "|" << endl;
-	cout << "-------";
-	cout << endl << "|" << to_char(block[3]) << "|" << to_char(block[4]) << "|" << to_char(block[5]) << "|" << endl;
-	cout << "-------";
-	cout << endl << "|" << to_char(block[6]) << "|" << to_char(block[7]) << "|" << to_char(block[8]) << "|" << endl;
-	cout << "-------";
+	int x = sizori;
+	int y = sizori;
+	int j = 0;
+	cout << endl << "Initial State : " << endl;
+	for (int i = 0; i < x; i++)
+	{
+		cout << "-------" << endl;
+		while (j < y)
+		{
+			cout << "|" << to_char(block[j], sizori);
+			j++;
+		}
+		cout << "|" << endl;
+		y = y + x;
 
+	}
 }
 
-char to_char(int i)
+int to_char(int i, int size)
 {
-	if (i >= 0 && i <= 7) return i + '1';
-	else if (i == 8) return 'x';
-	else { cout << "Program ERROR" << endl; return -1; }
-
+	int sizexx = size * size;
+	switch (size)
+	{
+	case 3:
+		if (i >= 1 && i <= sizexx - 1) return i;
+		if (i == sizexx) return 0;
+		else { printf("ERROR in Program!"); return -1; }
+		break;
+	case 4:
+		if (i >= 1 && i <= sizexx - 1) return i;
+		if (i == sizexx) return 0;
+		else { printf("ERROR in Program!"); return -1; }
+		break;
+	case 5:
+		if (i >= 1 && i <= sizexx - 1) return i;
+		if (i == sizexx) return 0;
+		else { printf("ERROR in Program!"); return -1; }
+		break;
+	}
 }
 
 int op(char i)
@@ -181,46 +304,84 @@ int op(char i)
 
 int main()
 {
-	int block[9];
-
-	cout << "8 Puzzle Game" << endl;
-
-	cout << "Masukkan state awal Puzzle !" << endl << "Penulisan dari kiri ke kanan lalu atas ke bawah" << endl << "x menandakan kosong" << endl;
-
-
-	int i = 0;
-	while (i < 9)
+	int size, temp1, temp2;
+	cout << "N Puzzle Game" << endl << "Masukkan Size Puzzle (N x N) [Ukuran Maksimal 5 x 5] : ";
+	cin >> size;
+	while (size > 5)
 	{
-		char chr;
-		cin >> chr;
-		if (chr == 32) continue;
-		if (chr == 'x') block[i] = 8;
-		else if (chr >= '1' && chr <= '9') block[i] = chr - '1';
-		else { cout << "Invalid Input" << endl; return 1; }
-		i++;
+		cout << "Ukuran diatas 5! " << endl << "Input Ulang : ";
+		cin >> size;
+	}
+	temp1 = size * size;
+	cout << "Masukkan state awal Puzzle !" << endl << "Penulisan dari kiri ke kanan lalu atas ke bawah" << endl << "0 menandakan kosong" << endl;
+
+	int block[25];
+	if (size == 3)
+	{
+		for (int i = 0; i < temp1; i++)
+		{
+			int chr;
+			cin >> chr;
+			if (chr == 0) block[i] = 9;
+			else { block[i] = chr; }
+		}
+	}
+		if (size == 4)
+		{
+		for (int i = 0; i < temp1; i++)
+		{
+			int chr;
+			cin >> chr;
+			if (chr == 0) block[i] = 16;
+			else { block[i] = chr; }
+		}
+		}
+		 if (size == 5)
+	{
+		for (int i = 0; i < temp1; i++)
+		{
+			int chr;
+			cin >> chr;
+			if (chr == 0) block[i] = 25;
+			else { block[i] = chr; }
+		}
 	}
 
 	cout << "Masukkan Goal State" << endl;
 
-	i = 0;
-	while (i < 9)
+	for (int i = 0; i < temp1; i++)
 	{
-		char chr;
-		cin >> chr;
-		if (chr == 32) continue;
-		if (chr == 'x') goal_block[i] = 8;
-		else if (chr >= '1' && chr <= '9') goal_block[i] = chr - '1';
-		else { cout << "Invalid Input" << endl; return 1; }
-		i++;
+		if (size == 3)
+		{
+			int chr;
+			cin >> chr;
+			if (chr == 0) goal_block3[i] = 9; 
+			else { goal_block3[i] = chr; }
+		}
+		else if (size == 4)
+		{
+			int chr;
+			cin >> chr;
+			if (chr == 0) goal_block3[i] = 16;
+			else { goal_block3[i] = chr; }
+		}
+		else if (size == 5)
+		{
+			int chr;
+			cin >> chr;
+			if (chr == 0) goal_block3[i] = 25;
+			else { goal_block3[i] = chr; }
+		}
+
 	}
 
-	cout << "Masukkan depth (maximal 40 depth)" << endl;
+	cout << "Masukkan depth : " << endl;
 	cin >> maxdepth;
 
 	top = newelement();
-	for (i = 0; i < 9; i++)
+	for (int i = 0; i < temp1; i++)
 		top->block[i] = block[i];
-	top->totalcost = heur(block);
+	top->totalcost = heur1(block, size);
 
 	node* newnode = newelement();
 
@@ -232,7 +393,7 @@ int main()
 			cout << "Tidak ada Solusi dengan depth : " << maxdepth << endl;
 			break;
 		}
-		else if (goal(node->block)) {
+		else if (goal(node->block, temp1)) {
 			char chr[15];
 			cout << "Selesai." << endl << "Menggunakan langkah paling sedikit : " << node->pathcost << endl;
 			cout << "Tampilkan tampilan puzzle ? (Y/N)" << endl;
@@ -241,15 +402,15 @@ int main()
 				break;
 			}
 
-			int block2[9];
-			for (i = 0; i < node->pathcost; i++)
+			int block2[25];
+			for (int i = 0; i < node->pathcost; i++)
 			{
-				print(block);
-				apply(block2, block, op(node->str[i]));
-				for (int j = 0; j <= 8; j++)
+				print(block, temp1, size);
+				apply(block2, block, op(node->str[i]), size);
+				for (int j = 0; j <= temp1 - 1; j++)
 					block[j] = block2[j];
 			}
-			print(block);
+			print(block, temp1, size);
 
 			cout << endl << "Tampilan selesai." << endl;
 			cout << node->str << endl;
@@ -259,17 +420,16 @@ int main()
 
 		if (node->totalcost > maxdepth) continue;
 
-		for (i = 0; i <= 3; i++) {
-			if (apply(newnode->block, node->block, i) == -1)
+		for (int i = 0; i <= size; i++) {
+			if (apply(newnode->block, node->block, i, size) == -1)
 				continue;
 
-			if (notonqueue(newnode->block)) {
-				prepend(newnode, node, i);
+			if (notonqueue(newnode->block, temp1)) {
+				prepend(newnode, node, i, size);
 				newnode = newelement();
 				if (newnode == NULL) { cout << "ERROR. Tambahkan depth" << endl; return 1; }
 			}
 		}
-
 	}
 	return 0;
 }
